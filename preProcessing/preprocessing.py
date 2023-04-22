@@ -2,6 +2,8 @@ def preprocessing(line):
     line = remove_bracket(line)
     line = remove_item_description(line)
     line = remove_sentence_after_footnote(line)
+    line = remove_after_item_number(line)
+    line = remove_after_contact_info(line)
     return line
 
 def remove_bracket(line):
@@ -18,6 +20,21 @@ def remove_item_description(line):
         line = line[:index] + line[index+6:]
     return line
 
+import re
+
+
+def remove_after_item_number(s):
+    pattern = r"(?i)\[?型番:?\s*[a-z0-9_-]+\]?"
+    match = re.search(pattern, s)
+    if match:
+        s = s[:match.start()]
+    pattern = r"(?i)(商品番号|型番|model)[：:]?\s*[a-z0-9_-]+"
+    match = re.search(pattern, s)
+    if match:
+        s = s[:match.start()] + s[match.end():]
+    return s.strip()
+
+
 
 def remove_sentence_after_footnote(line):
     # テキスト中の「※」を検索
@@ -32,3 +49,10 @@ def remove_sentence_after_footnote(line):
             # 「※」以降に文末がない場合は、全体を削除
             line = line[:index]
     return line
+
+def remove_after_contact_info(s):
+    pattern = r"(?i)店舗へのお問い合わせ.*"
+    match = re.search(pattern, s)
+    if match:
+        s = s[:match.start()]
+    return s
