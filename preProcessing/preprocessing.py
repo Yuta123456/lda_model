@@ -1,7 +1,7 @@
 def preprocessing(line, debug=False):
-    preprocesser = [remove_bracket, remove_item_description,
-                     remove_sentence_after_footnote, remove_after_item_number,
-                       remove_after_contact_info, remove_after_model_info, remove_extra_info]
+    preprocesser = [remove_item_description,
+                     remove_sentences_with_word, remove_after_item_number,
+                     remove_after_model_info, remove_extra_info]
     # 最後に追加
     preprocesser.append(remove_newlines)
     for p in preprocesser:
@@ -9,24 +9,6 @@ def preprocessing(line, debug=False):
         if debug:
             print(f"{p.__name__}",line)
     return line
-
-def remove_bracket(line):
-    while True:
-        start_index = line.find("【")
-        if start_index == -1:
-            break
-        end_index_period = line.find("。", start_index)
-        end_index_newline = line.find("\r\n", start_index)
-        if end_index_period == -1:
-            end_index = end_index_newline
-        elif end_index_newline == -1:
-            end_index = end_index_period
-        else:
-            end_index = min(end_index_period, end_index_newline)
-        if end_index == -1:
-            break
-        line = line[:start_index] + line[end_index + 1:]
-    return line.strip()
 
 def remove_item_description(line):
     # アイテム説明のインデックスを検索
@@ -38,6 +20,8 @@ def remove_item_description(line):
 
 import re
 
+import MeCab
+
 
 def remove_after_item_number(line):
     # 商品番号の削除
@@ -48,37 +32,6 @@ def remove_after_item_number(line):
         line = line[:idx] + line[match.end():]
     return line.strip()
 
-
-
-def remove_sentence_after_footnote(line):
-    while True:
-        # テキスト中の「※」または「＊」を検索
-        index1 = line.find("※")
-        index2 = line.find("＊")
-        if index1 != -1 and (index2 == -1 or index1 < index2):
-            # 「※」以降の一文を検索
-            period_index = line.find("。", index1)
-            if period_index != -1:
-                # 「※」以降の一文を削除
-                line = line[:index1] + line[period_index+1:]
-            else:
-                # 「※」以降に文末がない場合は、全体を削除
-                line = line[:index1]
-        elif index2 != -1 and (index1 == -1 or index2 < index1):
-            # 「＊」以降の一文を検索
-            period_index = line.find("。", index2)
-            if period_index != -1:
-                # 「＊」以降の一文を削除
-                line = line[:index2] + line[period_index+1:]
-            else:
-                # 「＊」以降に文末がない場合は、全体を削除
-                line = line[:index2]
-        else:
-            break
-    return line
-
-
-
 def remove_after_model_info(s):
     pattern = r"(?i)モデル.*"
     match = re.search(pattern, s)
@@ -86,19 +39,6 @@ def remove_after_model_info(s):
         s = s[:match.start()]
     return s
 
-def remove_after_contact_info(s):
-    pattern1 = r"(?i)店舗へのお問い合わせ.*"
-    pattern2 = r"店舗へお問い合わせの際は下記品番をお伝えください。.*"
-    
-    match1 = re.search(pattern1, s)
-    match2 = re.search(pattern2, s)
-    
-    if match1:
-        s = s[:match1.start()]
-    elif match2:
-        s = s[:match2.start()]
-        
-    return s
 def remove_extra_info(s):
     pattern = r"[\s\S]*(?=さらにくわしい情報をみる)"
     match = re.match(pattern, s)
@@ -109,3 +49,26 @@ def remove_extra_info(s):
 def remove_newlines(s):
     pattern = r"\r|\n"
     return re.sub(pattern, "", s)
+
+wakati = MeCab.Tagger("-Owakati")
+
+def remove_sentences_with_word(text):
+    # ポイントを入れるのがどうか？
+    words_to_remove = ["店舗", "※", "*", "＊",  "【", "購入",
+                        "本体価格", "送料", "ポイント", 
+                        "税込み", "全国", "特典", "商品番号",
+                        "品番", "型番", "不良", "サービス",
+                        "発送", "VIP", "税込", "無料", "返品",
+                        "連絡", "無料" ]
+    sentences = text.split('。')
+    cleaned_sentences = []
+    for sentence in sentences:
+        sentence_words = wakati.parse(sentence).strip().split()
+        should_remove = False
+        for word in words_to_remove:
+            if word in sentence_words:
+                should_remove = True
+                break
+        if not should_remove:
+            cleaned_sentences.append(sentence.strip())
+    return '。'.join(cleaned_sentences)

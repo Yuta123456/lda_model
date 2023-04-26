@@ -6,10 +6,10 @@ from preProcessing.preprocessing import preprocessing
 # 'D:\M1\fashion\IQON\IQON3000'
 # 。3966621\3966621_new.json
 
-filepaths = glob.glob("D:/M1/fashion/IQON/IQON3000/1468/**/*_new.json")
+filepaths = glob.glob("D:/M1/fashion/IQON/IQON3000/**/**/*_new.json")
 # filepaths = glob.glob("D:/M1/fashion/IQON/IQON3000/1468/3966621/3966621_new.json")
 wakati = MeCab.Tagger("-Owakati")
-for fp in filepaths:
+for fp in filepaths[100:200]:
     try:
         json_dict = pd.read_json(fp, encoding='shift-jis')
     except Exception as e:
@@ -19,10 +19,3 @@ for fp in filepaths:
     for item in json_dict["items"]:
         rm_br_str = preprocessing(item["expressions"][0], debug=False)
         print(rm_br_str)
-        # if (rm_br_str == ""):
-        #     print(fp)
-        #     print("="*100, "\n", item["expressions"][0], "\n","="*100)
-        # else:
-            
-        # print(wakati.parse(str(rm_br_str)).split())
-        
