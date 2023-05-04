@@ -1,10 +1,12 @@
 import sys
 import tomotopy as tp
 
-def lda_example(input_file, save_path):
+def lda_example(lines, save_path):
     mdl = tp.LDAModel(tw=tp.TermWeight.ONE, min_cf=3, rm_top=5, k=20)
-    for n, line in enumerate(open(input_file, encoding='utf-8')):
+    for line in lines[:10000]:
         ch = line.strip().split()
+        if len(ch) == 0:
+            continue
         mdl.add_doc(ch)
     mdl.burn_in = 100
     mdl.train(0)
@@ -26,6 +28,7 @@ def lda_example(input_file, save_path):
 
 # You can get the sample data file 'enwiki-stemmed-1000.txt'
 # at https://drive.google.com/file/d/18OpNijd4iwPyYZ2O7pQoPyeTAKEXa71J/view?usp=sharing
-
+with open('data/train.txt', 'r', encoding="utf-8") as f:
+    input_lines = f.read().splitlines()
 print('Running LDA')
-lda_example('enwiki-stemmed-1000.txt', 'test.lda.bin')
+lda_example(input_lines, 'test.lda.bin')
