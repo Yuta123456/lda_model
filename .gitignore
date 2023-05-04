@@ -1,1 +1,3 @@
 data/train.txt
+*.bin
+data/test_pos.txt
