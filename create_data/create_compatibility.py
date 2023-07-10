@@ -4,19 +4,6 @@ KEY = "category x color"
 import pandas as pd
 import glob
 
-import matplotlib.pyplot as plt
-def save_word_histogram(word_count_list, filepath):
-    words = [word for word, count in word_count_list]
-    counts = [count for word, count in word_count_list]
-
-    fig, ax =plt.subplots(figsize=(800, 800))
-    ax.bar(words, counts)
-    ax.set_xticklabels(words, rotation=90, fontname="Meiryo")
-    ax.set_xlabel('category')
-    ax.set_ylabel('Frequency')
-
-    plt.savefig(filepath)
-    plt.close()
 
 # filepaths = glob.glob("D:/M1/fashion/IQON/IQON3000/**/**/*_new.json")
 fileDir = glob.glob("D:/M1/fashion/IQON/IQON3000/**/")

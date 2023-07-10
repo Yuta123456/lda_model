@@ -1,6 +1,10 @@
 # import json
 import pandas as pd
 import glob
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from preProcessing.preprocessing import preprocessing
 from util.is_stopword import is_stopword
 from util.parse_sentence import parse_sentence
@@ -41,7 +45,6 @@ for fp in filepaths:
             continue
         rm_br_str = preprocessing(item["expressions"][0], debug=False)
         res = parse_sentence(rm_br_str)
-        print(res)
         for word, hinshi in res:
             if is_stopword(hinshi) or len(word) <= 1:
                 continue
@@ -51,9 +54,13 @@ for fp in filepaths:
                 count[word] = 1
     if (c % 100 == 0):
         print(f"{c * 100 / file_count}%終了")
-count = sorted(count.items(), key=lambda x: x[1], reverse=True)
-count = [t for t in count if t[1] > 10000]
-print("words length = ", len(count))
-save_word_histogram(count, 'frequency.png')
+count_list = sorted(count.items(), key=lambda x: x[1], reverse=True)
+# count = [t for t in count if t[1] > 10000]
+print("words length = ", len(count_list))
+# save_word_histogram(count, 'frequency.png')
+import json
+
+with open('./vocab.json','w', encoding='shift-jis') as f:
+    json.dump(count, f, ensure_ascii=False)
 
 

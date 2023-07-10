@@ -9,6 +9,8 @@ def parse_sentence(sentence):
     node = node.next
     result = []
     for w in parsed:
+        if (not node):
+            continue
         hinshi = node.feature.split(",")[0]
         result.append((w, hinshi))
         node = node.next
