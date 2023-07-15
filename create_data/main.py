@@ -10,7 +10,7 @@ from util.parse_sentence import parse_sentence
 
 import glob
 import pandas as pd
-
+KEY = "category x color"
 count = {}
 with open('data/filepath/test.txt', 'r', encoding="utf-8") as f:
     filepaths = f.read().splitlines()
@@ -32,10 +32,11 @@ with open(output_file, mode="a", encoding="utf-8") as f:
                 continue
             rm_br_str = preprocessing(item["expressions"][0], debug=False)
             res = parse_sentence(rm_br_str)
+            category = item[KEY].split(' × ')[0]
             for word, hinshi in res:
                 if is_stopword(hinshi) or len(word) <= 1:
                     continue
-                words += [word]
+                words += [category + '_' + word]
         document = " ".join(words) + "\n"
 
         f.write(document)

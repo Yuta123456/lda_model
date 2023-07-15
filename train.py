@@ -41,4 +41,4 @@ def lda_example(lines, save_path):
 with open('data/train.txt', 'r', encoding="utf-8") as f:
     input_lines = f.read().splitlines()
 print('Running LDA')
-lda_example(input_lines, f'pa-T-{TOPIC_NUM}-M-{MIN_CF}-R-{RM_TOP}-B-{BURN_IN}.bin')
+lda_example(input_lines, f'ctm-T-{TOPIC_NUM}-M-{MIN_CF}-R-{RM_TOP}-B-{BURN_IN}.bin')
