@@ -6,13 +6,12 @@ HYPER PARAMETERS
 """
 TOPIC_NUM = 100
 MIN_CF = 10000
-RM_TOP = 30
 BURN_IN = 1000
 
 
 def lda_example(lines, save_path):
     # mdl = tp.LDAModel(tw=tp.TermWeight.ONE, min_cf=MIN_CF, rm_top=RM_TOP, k=TOPIC_NUM)
-    mdl = tp.LDAModel(tw=tp.TermWeight.ONE, min_cf=MIN_CF, rm_top=RM_TOP, k=TOPIC_NUM)
+    mdl = tp.LLDAModel(tw=tp.TermWeight.ONE, min_cf=MIN_CF, k=TOPIC_NUM)
     for line in lines:
         ch = line.strip().split()
         if len(ch) == 0:
@@ -23,7 +22,7 @@ def lda_example(lines, save_path):
     print('Num docs:', len(mdl.docs), ', Vocab size:', len(mdl.used_vocabs), ', Num words:', mdl.num_words)
     print('Removed top words:', mdl.removed_top_words)
     print('Training...', file=sys.stderr, flush=True)
-    for i in range(0, 3000, 20):
+    for i in range(0, 1000, 20):
         mdl.train(20)
         print('Iteration: {}\tLog-likelihood: {}'.format(i, mdl.ll_per_word))
     
@@ -38,7 +37,7 @@ def lda_example(lines, save_path):
 
 # You can get the sample data file 'enwiki-stemmed-1000.txt'
 # at https://drive.google.com/file/d/18OpNijd4iwPyYZ2O7pQoPyeTAKEXa71J/view?usp=sharing
-with open('data/with_category/train.txt', 'r', encoding="utf-8") as f:
+with open('data/fashion_clip/train.txt', 'r', encoding="utf-8") as f:
     input_lines = f.read().splitlines()
 print('Running LDA')
-lda_example(input_lines, f'lda-T-{TOPIC_NUM}-M-{MIN_CF}-R-{RM_TOP}-B-{BURN_IN}.bin')
+lda_example(input_lines, f'ctm-fashion-clip-T-{TOPIC_NUM}-M-{MIN_CF}-B-{BURN_IN}.bin')
